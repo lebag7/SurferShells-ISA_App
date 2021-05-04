@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class MySqlConnection {
     private Connection connectDB(String url, String user, String password) {
@@ -25,17 +27,61 @@ public class MySqlConnection {
         return connection;
     }
 
-    private void insertDB(String stockname, Double price, Date price_date, String industry) {
+    private void insertDB(Integer id, String stockname, Double price, Date price_date, String industry) {
 
-        String sql = "INSERT INTO all_in_one(stockname,price,price_date,industry) VALUES(?,?,?,?)";
+        String sql1 = "INSERT INTO stockname(id,stockname) VALUES(?,?) ON DUPLICATE KEY UPDATE stockname = VALUES(stockname);";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 
-                PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, stockname);
+            PreparedStatement pstmt = connection.prepareStatement(sql1)) {
+                pstmt.setInt(1, id);
+                pstmt.setString(2, stockname);
+                pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String sql2 = "INSERT INTO industry(id,industry) VALUES(?,?) ON DUPLICATE KEY UPDATE industry = VALUES(industry)";
+
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+
+            PreparedStatement pstmt = connection.prepareStatement(sql2)) {
+                pstmt.setInt(1, id);
+                pstmt.setString(2, industry);
+                pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES(?,?,?,?,?)";
+
+        try (
+            Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+            Statement st = connection.createStatement(); 
+            PreparedStatement pstmt = connection.prepareStatement(sql3)
+            ) {
+            
+            ResultSet rsIndustry = st.executeQuery("SELECT * FROM industry WHERE industry='"+industry+"';");
+            int industryID=0;
+            while (rsIndustry.next())
+            {
+              industryID = rsIndustry.getInt("id");
+            }
+
+            ResultSet rsStockname = st.executeQuery("SELECT * FROM stockname WHERE stockname='"+stockname+"';");
+            int stocknameID=0;
+            while (rsStockname.next())
+            {
+                stocknameID = rsStockname.getInt("id");
+            }
+
+            pstmt.setInt(1, id);
             pstmt.setDouble(2, price);
             pstmt.setDate(3, price_date);
-            pstmt.setString(4, industry);
+            pstmt.setInt(4, stocknameID);
+            pstmt.setInt(5, industryID);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -43,28 +89,27 @@ public class MySqlConnection {
         }
     }
 
+    private Date parseDate(String date) {
+        return Date.valueOf(LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yy")));
+    }
+
+    private Double convertToDouble(String value) {
+        return Double.parseDouble(value.replaceAll("€", "").replaceAll(" ", "").replace(",", "."));
+    }
+
     public void importCSVFileToDB(String path) {
 
         try {
             BufferedReader buff = new BufferedReader(new FileReader(path));
-            Integer rowNo = 1;
+            Integer rowNo = 0;
             String line = "";
             while ((line = buff.readLine()) != null) {
+
                 String[] values = line.split(";");
-                values[1] = values[1].replaceAll("€", "").replaceAll(" ", "").replace(",", ".");
-                values[2] = values[2].replaceAll("€", "").replaceAll(" ", "");
 
-                if (rowNo > 1) {
-
-                    values[1] = values[1].replaceAll("€", "").replaceAll(" ", "").replace(",", ".");
+                if (rowNo > 0) {
                     System.out.println(values[0] + " | " + values[1] + " | " + values[2] + " | " + values[3]);
-                    String[] date = values[2].split("\\.");
-                    String day = date[0];
-                    String month = date[1];
-                    String year = date[2];
-                    values[2] = "20" + year + "-" + month + "-" + day;
-                    System.out.println(values[0] + " | " + values[1] + " | " + values[2] + " | " + values[3]);
-                    insertDB(values[0], Double.parseDouble(values[1]), Date.valueOf(values[2]), values[3]);
+                    insertDB(rowNo,values[0], convertToDouble(values[1]), parseDate(values[2]), values[3] );
                 }
                 rowNo++;
             }

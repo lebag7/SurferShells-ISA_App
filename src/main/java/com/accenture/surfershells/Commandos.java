@@ -17,7 +17,9 @@ public class Commandos {
         if ("DELETE".equals(input)) {
             System.out.println("Delete value: ALL ");
 
-            new MySqlConnection().truncateTable("all_in_one");
+            new MySqlConnection().truncateTable("price_per_date");
+            new MySqlConnection().truncateTable("industry");
+            new MySqlConnection().truncateTable("stockname");
 
             System.out.println("All values have been deleted!");
         }
