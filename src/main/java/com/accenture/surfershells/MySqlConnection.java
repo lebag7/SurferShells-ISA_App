@@ -33,10 +33,10 @@ public class MySqlConnection {
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 
-            PreparedStatement pstmt = connection.prepareStatement(sql1)) {
-                pstmt.setInt(1, id);
-                pstmt.setString(2, stockname);
-                pstmt.executeUpdate();
+                PreparedStatement pstmt = connection.prepareStatement(sql1)) {
+            pstmt.setInt(1, id);
+            pstmt.setString(2, stockname);
+            pstmt.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -46,10 +46,10 @@ public class MySqlConnection {
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 
-            PreparedStatement pstmt = connection.prepareStatement(sql2)) {
-                pstmt.setInt(1, id);
-                pstmt.setString(2, industry);
-                pstmt.executeUpdate();
+                PreparedStatement pstmt = connection.prepareStatement(sql2)) {
+            pstmt.setInt(1, id);
+            pstmt.setString(2, industry);
+            pstmt.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -57,23 +57,19 @@ public class MySqlConnection {
 
         String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES(?,?,?,?,?)";
 
-        try (
-            Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-            Statement st = connection.createStatement(); 
-            PreparedStatement pstmt = connection.prepareStatement(sql3)
-            ) {
-            
-            ResultSet rsIndustry = st.executeQuery("SELECT * FROM industry WHERE industry='"+industry+"';");
-            int industryID=0;
-            while (rsIndustry.next())
-            {
-              industryID = rsIndustry.getInt("id");
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                Statement st = connection.createStatement();
+                PreparedStatement pstmt = connection.prepareStatement(sql3)) {
+
+            ResultSet rsIndustry = st.executeQuery("SELECT * FROM industry WHERE industry='" + industry + "';");
+            int industryID = 0;
+            while (rsIndustry.next()) {
+                industryID = rsIndustry.getInt("id");
             }
 
-            ResultSet rsStockname = st.executeQuery("SELECT * FROM stockname WHERE stockname='"+stockname+"';");
-            int stocknameID=0;
-            while (rsStockname.next())
-            {
+            ResultSet rsStockname = st.executeQuery("SELECT * FROM stockname WHERE stockname='" + stockname + "';");
+            int stocknameID = 0;
+            while (rsStockname.next()) {
                 stocknameID = rsStockname.getInt("id");
             }
 
@@ -109,7 +105,7 @@ public class MySqlConnection {
 
                 if (rowNo > 0) {
                     System.out.println(values[0] + " | " + values[1] + " | " + values[2] + " | " + values[3]);
-                    insertDB(rowNo,values[0], convertToDouble(values[1]), parseDate(values[2]), values[3] );
+                    insertDB(rowNo, values[0], convertToDouble(values[1]), parseDate(values[2]), values[3]);
                 }
                 rowNo++;
             }
@@ -123,11 +119,63 @@ public class MySqlConnection {
     public void truncateTable(String table) {
         String sql = "TRUNCATE " + table;
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } 
+    }
+
+    public void searchId(String searchString) {
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                Statement st = connection.createStatement()) {
+            ResultSet rs = st
+                    .executeQuery("SELECT * FROM isa_db.stockname where stockname like '" + searchString + "%';");
+
+            while (rs.next()) {
+                String stockname = rs.getString("stockname");
+                Integer id = rs.getInt("id");
+                System.out.println("ID: " + id + " - " + stockname + " ");
+
+            }
+        } catch (Exception e) {
+
         }
     }
+
+    public void addRow(String inputID, String inputPrice, String inputDate) {
+
+        Integer id = Integer.parseInt(inputID);
+        System.out.println(inputPrice);
+        Double price = convertToDouble(inputPrice);
+        Date price_date = parseDate(inputDate);
+
+        String sql = "INSERT INTO price_per_date(price,date,id_stockname,id_industry) VALUES(?,?,?,?)";
+
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                Statement st = connection.createStatement();
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            ResultSet rsIndustry = st.executeQuery("SELECT * FROM price_per_date WHERE id_stockname='" + id + "';");
+            int industryID = 0;
+            while (rsIndustry.next()) {
+                industryID = rsIndustry.getInt("id_industry");
+            }
+
+            pstmt.setDouble(1, price);
+            pstmt.setDate(2, price_date);
+            pstmt.setInt(3, id);
+            pstmt.setInt(4, industryID);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void exportToCSV() {
+        String sql = "SELECT * FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id LEFT JOIN stockname ON price_per_date.id_stockname = stockname.id;";
+        
+    }
+
 }
