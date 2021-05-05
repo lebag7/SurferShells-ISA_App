@@ -38,12 +38,12 @@ public class Commandos {
     public void addPrice(Scanner scanner, String input) {
         if ("ADD".equals(input)) {
             System.out.println("Type in ID:");
-            String inputID = scanner.nextLine();
+            String inputStocknameID = scanner.nextLine();
             System.out.println("Type in date:");
             String inputDate = scanner.nextLine();
             System.out.println("Type in Price:");
             String inputPrice = scanner.nextLine();
-            new MySqlConnection().addRow(inputID, inputPrice, inputDate);
+            new MySqlConnection().addRow(inputStocknameID, inputPrice, inputDate);
         }
 
     }
@@ -53,6 +53,44 @@ public class Commandos {
             System.out.println("Type in ID:");
             String inputID = scanner.nextLine();
             new MySqlConnection().showStockValuesSQL(inputID);
+        }
+
+    }
+
+    public void maxStockValue(Scanner scanner, String input) {
+        if ("MAX".equals(input)) {
+            System.out.println("Type in ID:");
+            String inputID = scanner.nextLine();
+            new MySqlConnection().maxSQL(inputID);
+        }
+
+    }
+
+    public void minStockValue(Scanner scanner, String input) {
+        if ("MIN".equals(input)) {
+            System.out.println("Type in ID:");
+            String inputID = scanner.nextLine();
+            new MySqlConnection().minSQL(inputID);
+        }
+
+    }
+
+    public void gapStockValue(Scanner scanner, String input) {
+        if ("GAP".equals(input)) {
+            System.out.println("Type in ID:");
+            String inputID = scanner.nextLine();
+            new MySqlConnection().gapSQL(inputID);
+        }
+
+    }
+
+    public void updateIndustry(Scanner scanner, String input) {
+        if ("UPDATE-INDUSTRY".equals(input)) {
+            System.out.println("Type in ID:");
+            String inputID = scanner.nextLine();
+            System.out.println("Type in Industry:");
+            String inputIndustry = scanner.nextLine();
+            new MySqlConnection().updateIndustrySQL(inputID, inputIndustry);
         }
 
     }

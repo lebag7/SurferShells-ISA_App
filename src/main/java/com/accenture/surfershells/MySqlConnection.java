@@ -147,10 +147,9 @@ public class MySqlConnection {
         }
     }
 
-    public void addRow(String inputID, String inputPrice, String inputDate) {
+    public void addRow(String inputStocknameID, String inputPrice, String inputDate) {
 
-        Integer id = Integer.parseInt(inputID);
-        System.out.println(inputPrice);
+        Integer id_stockname = Integer.parseInt(inputStocknameID);
         Double price = convertToDouble(inputPrice);
         Date price_date = parseDate(inputDate);
 
@@ -160,7 +159,8 @@ public class MySqlConnection {
                 Statement st = connection.createStatement();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            ResultSet rsIndustry = st.executeQuery("SELECT * FROM price_per_date WHERE id_stockname='" + id + "';");
+            ResultSet rsIndustry = st
+                    .executeQuery("SELECT * FROM price_per_date WHERE id_stockname='" + id_stockname + "';");
             int industryID = 0;
             while (rsIndustry.next()) {
                 industryID = rsIndustry.getInt("id_industry");
@@ -168,7 +168,7 @@ public class MySqlConnection {
 
             pstmt.setDouble(1, price);
             pstmt.setDate(2, price_date);
-            pstmt.setInt(3, id);
+            pstmt.setInt(3, id_stockname);
             pstmt.setInt(4, industryID);
             pstmt.executeUpdate();
 
@@ -196,6 +196,81 @@ public class MySqlConnection {
         } catch (Exception e) {
 
         }
+    }
+
+    public Double maxSQL(String searchID) {
+
+        String sql = "SELECT max(price) as max_price FROM isa_db.price_per_date WHERE id_stockname = ?;";
+        Double max_price = 0.0;
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Integer.parseInt(searchID));
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                // Integer id = rs.getInt("id_stockname");
+                max_price = rs.getDouble("max_price");
+                // Date date = rs.getDate("date");
+                System.out.println("Maximum price: " + max_price);
+
+            }
+        } catch (Exception e) {
+
+        }
+        return max_price;
+    }
+
+    public Double minSQL(String searchID) {
+
+        String sql = "SELECT min(price) as min_price FROM isa_db.price_per_date WHERE id_stockname = ?;";
+        Double min_price = 0.0;
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Integer.parseInt(searchID));
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                // Integer id = rs.getInt("id_stockname");
+                min_price = rs.getDouble("min_price");
+                // Date date = rs.getDate("date");
+                System.out.println("Minimum price: " + min_price);
+            }
+        } catch (Exception e) {
+
+        }
+        return min_price;
+    }
+
+    public void gapSQL(String searchID) {
+
+        Double max = maxSQL(searchID);
+        Double min = minSQL(searchID);
+        Double gap = max - min;
+
+        if (max == min) {
+            System.out.println("No gap!");
+        } else {
+            System.out.println("Gap: " + gap);
+        }
+    }
+
+    public void updateIndustrySQL(String industryID, String industryUpdateName) {
+
+        String sql = "UPDATE industry SET industry = ? WHERE id = ?;";
+
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, industryUpdateName);
+            pstmt.setInt(2, Integer.parseInt(industryID));
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
 }
