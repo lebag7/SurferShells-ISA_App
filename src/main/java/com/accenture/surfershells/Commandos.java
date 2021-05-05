@@ -20,7 +20,7 @@ public class Commandos {
             new MySqlConnection().truncateTable("price_per_date");
             new MySqlConnection().truncateTable("industry");
             new MySqlConnection().truncateTable("stockname");
-    
+
             System.out.println("All values have been deleted!");
         }
 
@@ -43,10 +43,18 @@ public class Commandos {
             String inputDate = scanner.nextLine();
             System.out.println("Type in Price:");
             String inputPrice = scanner.nextLine();
-            new MySqlConnection().addRow(inputID,inputPrice,inputDate);
+            new MySqlConnection().addRow(inputID, inputPrice, inputDate);
         }
 
     }
-    
+
+    public void showStockValues(Scanner scanner, String input) {
+        if ("SHOW".equals(input)) {
+            System.out.println("Type in ID:");
+            String inputID = scanner.nextLine();
+            new MySqlConnection().showStockValuesSQL(inputID);
+        }
+
+    }
 
 }

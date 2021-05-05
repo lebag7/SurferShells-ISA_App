@@ -29,7 +29,9 @@ public class MySqlConnection {
 
     private void insertDB(Integer id, String stockname, Double price, Date price_date, String industry) {
 
-        String sql1 = "INSERT INTO stockname(id,stockname) VALUES(?,?) ON DUPLICATE KEY UPDATE stockname = VALUES(stockname);";
+        // String sql1 = "INSERT INTO stockname(id,stockname) VALUES(?,?) ON DUPLICATE
+        // KEY UPDATE stockname = VALUES(stockname);";
+        String sql1 = "INSERT IGNORE INTO stockname(id,stockname) VALUES(?,?);";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 
@@ -42,7 +44,9 @@ public class MySqlConnection {
             System.out.println(e.getMessage());
         }
 
-        String sql2 = "INSERT INTO industry(id,industry) VALUES(?,?) ON DUPLICATE KEY UPDATE industry = VALUES(industry)";
+        // String sql2 = "INSERT INTO industry(id,industry) VALUES(?,?) ON DUPLICATE KEY
+        // UPDATE industry = VALUES(industry)";
+        String sql2 = "INSERT IGNORE INTO industry(id,industry) VALUES(?,?);";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 
@@ -123,7 +127,7 @@ public class MySqlConnection {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } 
+        }
     }
 
     public void searchId(String searchString) {
@@ -173,9 +177,25 @@ public class MySqlConnection {
         }
     }
 
-    public void exportToCSV() {
-        String sql = "SELECT * FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id LEFT JOIN stockname ON price_per_date.id_stockname = stockname.id;";
-        
+    public void showStockValuesSQL(String searchID) {
+
+        String sql = "SELECT * FROM isa_db.price_per_date WHERE id_stockname = ? ORDER BY date DESC LIMIT 10;";
+
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Integer.parseInt(searchID));
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Integer id = rs.getInt("id_stockname");
+                Double price = rs.getDouble("price");
+                Date date = rs.getDate("date");
+                System.out.println("ID: " + id + " | " + date + " | " + " price: " + price);
+            }
+        } catch (Exception e) {
+
+        }
     }
 
 }
