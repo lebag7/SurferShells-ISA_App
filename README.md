@@ -4,7 +4,7 @@ The customer “International Stock Analysis” (ISA) wants to create an applica
 # General Requirements:
 
 - Creating a new database which stores stocks and prices for a given moment in time.
-- The application works as a “REPL” application, which means, it only stops when the user types “exit”.
+- The application works as a “REPL” application, which means, it only stops when the user types “EXIT”.
 
 # Application Features:
 
