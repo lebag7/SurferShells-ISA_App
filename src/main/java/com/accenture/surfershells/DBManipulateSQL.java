@@ -10,13 +10,13 @@ public class DBManipulateSQL extends MySqlConnection {
 
     private void insertDB(Integer id, String stockname, Double price, Date price_date, String industry) {
 
-        // String sql1 = "INSERT INTO stockname(id,stockname) VALUES(?,?) ON DUPLICATE
-        // KEY UPDATE stockname = VALUES(stockname);";
+        
+        
         String sql1 = "INSERT IGNORE INTO stockname(id,stockname) VALUES(?,?);";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-
-                PreparedStatement pstmt = connection.prepareStatement(sql1)) {
+                    
+        PreparedStatement pstmt = connection.prepareStatement(sql1)) {
             pstmt.setInt(1, id);
             pstmt.setString(2, stockname);
             pstmt.executeUpdate();
@@ -25,46 +25,36 @@ public class DBManipulateSQL extends MySqlConnection {
             System.out.println(e.getMessage());
         }
 
-        // String sql2 = "INSERT INTO industry(id,industry) VALUES(?,?) ON DUPLICATE KEY
-        // UPDATE industry = VALUES(industry)";
+
         String sql2 = "INSERT IGNORE INTO industry(id,industry) VALUES(?,?);";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-
                 PreparedStatement pstmt = connection.prepareStatement(sql2)) {
+            
+            
             pstmt.setInt(1, id);
-            pstmt.setString(2, industry);
+            pstmt.setString(2,industry);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
-        String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES(?,?,?,?,?)";
+        String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES "
+         + "(?,?,?,(SELECT id FROM stockname WHERE stockname = ?),(SELECT id FROM industry WHERE industry = ?))";
 
-        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-                Statement st = connection.createStatement();
-                PreparedStatement pstmt = connection.prepareStatement(sql3)) {
+        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");     
+        PreparedStatement pstmt = connection.prepareStatement(sql3)) {
 
-            ResultSet rsIndustry = st.executeQuery("SELECT * FROM industry WHERE industry='" + industry + "';");
-            int industryID = 0;
-            while (rsIndustry.next()) {
-                industryID = rsIndustry.getInt("id");
-            }
-
-            ResultSet rsStockname = st.executeQuery("SELECT * FROM stockname WHERE stockname='" + stockname + "';");
-            int stocknameID = 0;
-            while (rsStockname.next()) {
-                stocknameID = rsStockname.getInt("id");
-            }
-
+            
             pstmt.setInt(1, id);
             pstmt.setDouble(2, price);
             pstmt.setDate(3, price_date);
-            pstmt.setInt(4, stocknameID);
-            pstmt.setInt(5, industryID);
+            pstmt.setString(4, stockname);
+            pstmt.setString(5, industry);
             pstmt.executeUpdate();
-
+            
+            
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -72,8 +62,8 @@ public class DBManipulateSQL extends MySqlConnection {
 
     public void importCSVFileToDB_SQL(String path) {
 
-        try {
-            BufferedReader buff = new BufferedReader(new FileReader(path));
+        try (BufferedReader buff = new BufferedReader(new FileReader(path));){
+            
             Integer rowNo = 0;
             String line = "";
             while ((line = buff.readLine()) != null) {
@@ -93,8 +83,8 @@ public class DBManipulateSQL extends MySqlConnection {
         }
     }
 
-    public void truncateTableSQL(String table) {
-        String sql = "TRUNCATE " + table;
+    public void deleteTableSQL(String table) {
+        String sql = "DELETE FROM " + table +";";
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.executeUpdate();

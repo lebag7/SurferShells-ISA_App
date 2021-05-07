@@ -6,7 +6,7 @@ public class Commandos {
 
     public void importCSV(String input) {
         if ("IMPORT".equals(input)) {
-            new DBManipulateSQL().importCSVFileToDB_SQL("C:/Users/yasmine.gabel/Desktop/STOCK_DATA_2.csv");
+            new DBManipulateSQL().importCSVFileToDB_SQL("C:/Users/yasmine.gabel/Desktop/STOCK_DATA_3.csv");
         }
 
     }
@@ -14,9 +14,9 @@ public class Commandos {
     public void delete(String input) {
         if ("DELETE".equals(input)) {
 
-            new DBManipulateSQL().truncateTableSQL("price_per_date");
-            new DBManipulateSQL().truncateTableSQL("industry");
-            new DBManipulateSQL().truncateTableSQL("stockname");
+            new DBManipulateSQL().deleteTableSQL("price_per_date");
+            new DBManipulateSQL().deleteTableSQL("industry");
+            new DBManipulateSQL().deleteTableSQL("stockname");
 
             System.out.println("All values have been deleted!");
         }

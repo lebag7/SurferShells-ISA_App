@@ -12,4 +12,6 @@ public class DBType {
     static Double parseToDouble(String value) {
         return Double.parseDouble(value.replaceAll("€", "").replaceAll(" ", "").replace(",", "."));
     }
+
+    
 }
