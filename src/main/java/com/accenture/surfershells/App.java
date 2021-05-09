@@ -31,7 +31,9 @@ public class App {
             new Commandos().exportDB(input);
 
             if ("EXIT".equals(input)) {
-                System.out.println("Exit program: ");
+                System.out.println( "|*****************|");
+                System.out.println( "|  EXIT ISA App!  |");
+                System.out.println( "|*****************|");
                 exit = false;
                 scanner.close();
             }

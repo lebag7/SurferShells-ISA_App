@@ -24,7 +24,7 @@ public class DBManipulateSQL extends MySqlConnection {
                     Integer id = rowNo;
                     String stock_name = values[0];
                     Double price = DBType.parseToDouble(values[1]);
-                    Date price_date = DBType.parseDate(values[2]);
+                    Date price_date = DBType.parseDate(values[2]); //e.g. date =20.05.20 -> wird als Date an Variable übergeben
                     String industry_name = values[3];
 
                     String sql1 = "INSERT IGNORE INTO stock(id,stock_name) VALUES(?,?);";
@@ -86,11 +86,12 @@ public class DBManipulateSQL extends MySqlConnection {
                 Statement st = connection.createStatement();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            ResultSet rsIndustry = st
+            ResultSet rsIndustryID = st
                     .executeQuery("SELECT * FROM price_per_date WHERE id_stockname='" + id_stockname + "';");
             int industryID = 0;
-            while (rsIndustry.next()) {
-                industryID = rsIndustry.getInt("id_industry");
+            while (rsIndustryID.next()) {
+                //Nur ein Schleifendurchlauf
+                industryID = rsIndustryID.getInt("id_industry");
             }
 
             pstmt.setDouble(1, price);

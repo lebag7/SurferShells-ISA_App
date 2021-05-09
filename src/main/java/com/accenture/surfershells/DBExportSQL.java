@@ -17,7 +17,7 @@ public class DBExportSQL extends MySqlConnection {
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 Statement st = connection.createStatement();
                 CSVWriter writer = new CSVWriter(
-                    new FileWriter(new File("C:/Users/yasmine.gabel/Desktop/STOCK_DATA_3_EXPORT.csv")),
+                    new FileWriter(new File("C:/Users/yasmine.gabel/Desktop/Output/STOCK_DATA_3_EXPORT.csv")),
                     ';',
                     CSVWriter.NO_QUOTE_CHARACTER,
                     CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -28,7 +28,7 @@ public class DBExportSQL extends MySqlConnection {
             
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } catch (IOException e){
+        }  catch (IOException e){
             System.out.println(e.getCause());
         }
     }
