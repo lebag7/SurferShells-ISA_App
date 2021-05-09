@@ -13,19 +13,18 @@ public class Commandos {
 
     public void delete(String input) {
         if ("DELETE".equals(input)) {
-
-            new DBManipulateSQL().deleteTableSQL("price_per_date");
-            new DBManipulateSQL().deleteTableSQL("industry");
-            new DBManipulateSQL().deleteTableSQL("stockname");
+            new DBManipulateSQL().deleteAllValuesOfTable("price_per_date");
+            new DBManipulateSQL().deleteAllValuesOfTable("industry");
+            new DBManipulateSQL().deleteAllValuesOfTable("stock");
 
             System.out.println("All values have been deleted!");
         }
 
     }
 
-    public void searchStockname(Scanner scanner, String input) {
+    public void searchStock(Scanner scanner, String input) {
         if ("SEARCH".equals(input)) {
-            System.out.println("Type in the first characters to search for a stockname");
+            System.out.println("Type in the first characters to search for a stock:");
             String inputSearchString = scanner.nextLine();
             new DBViewSQL().searchIdSQL(inputSearchString);
         }
@@ -38,7 +37,7 @@ public class Commandos {
             String inputStocknameID = scanner.nextLine();
             System.out.println("Type in date:");
             String inputDate = scanner.nextLine();
-            System.out.println("Type in Price:");
+            System.out.println("Type in price:");
             String inputPrice = scanner.nextLine();
             new DBManipulateSQL().addRowSQL(inputStocknameID, inputPrice, inputDate);
         }
@@ -83,9 +82,9 @@ public class Commandos {
 
     public void updateIndustry(Scanner scanner, String input) {
         if ("UPDATE-INDUSTRY".equals(input)) {
-            System.out.println("Type in ID of stock:");
+            System.out.println("Type in ID of industry:");
             String inputID = scanner.nextLine();
-            System.out.println("Type in Industry:");
+            System.out.println("Type in industry name for update:");
             String inputIndustry = scanner.nextLine();
             new DBManipulateSQL().updateIndustrySQL(inputID, inputIndustry);
         }

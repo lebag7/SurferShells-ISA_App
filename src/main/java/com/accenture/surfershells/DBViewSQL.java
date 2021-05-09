@@ -4,20 +4,20 @@ import java.sql.*;
 import java.util.Date;
 
 public class DBViewSQL extends MySqlConnection {
+
     public void searchIdSQL(String searchString) {
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 Statement st = connection.createStatement()) {
-            ResultSet rs = st
-                    .executeQuery("SELECT * FROM isa_db.stockname where stockname like '" + searchString + "%';");
+            ResultSet rs = st.executeQuery("SELECT * FROM isa_db.stock WHERE stock_name LIKE '" + searchString + "%';");
 
             while (rs.next()) {
-                String stockname = rs.getString("stockname");
+                String stock_name = rs.getString("stock_name");
                 Integer id = rs.getInt("id");
-                System.out.println("ID: " + id + " - " + stockname + " ");
+                System.out.println("id: " + id + " - " + stock_name + " ");
 
             }
-        } catch (Exception e) {
-
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -37,8 +37,8 @@ public class DBViewSQL extends MySqlConnection {
                 Date date = rs.getDate("date");
                 System.out.println("ID: " + id + " | " + date + " | " + " price: " + price);
             }
-        } catch (Exception e) {
-
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -52,13 +52,14 @@ public class DBViewSQL extends MySqlConnection {
             pstmt.setInt(1, Integer.parseInt(searchID));
             ResultSet rs = pstmt.executeQuery();
 
-            while (rs.next()) {
+            while (rs.next()) { 
+                // nur ein Schleifendurchlauf, keine andere möglickeit gesehen, den Wert anders zu bekommen.
                 max_price = rs.getDouble("max_price");
                 System.out.println("Maximum price: " + max_price);
 
             }
-        } catch (Exception e) {
-
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
         return max_price;
     }
@@ -77,23 +78,21 @@ public class DBViewSQL extends MySqlConnection {
                 min_price = rs.getDouble("min_price");
                 System.out.println("Minimum price: " + min_price);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
 
         }
         return min_price;
     }
 
     public void gapSQL(String searchID) {
-
+        
         Double max = maxSQL(searchID);
         Double min = minSQL(searchID);
         Double gap = max - min;
-
-        if (max == min) {
-            System.out.println("No gap!");
-        } else {
-            System.out.println("Gap: " + gap);
-        }
+        
+        System.out.println("Gap: " + gap);
+        
     }
 
     public void showIndustriesSQL() {
@@ -101,14 +100,15 @@ public class DBViewSQL extends MySqlConnection {
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 Statement st = connection.createStatement()) {
 
-            ResultSet rs = st.executeQuery("SELECT  count(id_stockname) as amount_stocknames, industry, id_industry FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id group by industry, id_industry;");
+            ResultSet rs = st.executeQuery("SELECT  count(distinct id_stockname) as amount_stocks, industry_name, id_industry FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id group by industry_name, id_industry;");
             
             while (rs.next()) {
-                Integer id = rs.getInt("id_industry");
-                Integer amount_stocknames = rs.getInt("amount_stocknames");
-                System.out.println("ID: " + id + " | "  + " Amount of stocks: " + amount_stocknames);
+                Integer idIndustry = rs.getInt("id_industry");
+                Integer amount_stocks = rs.getInt("amount_stocks");
+                System.out.println("Industry ID: " + idIndustry + " | "  + " Amount of stocks: " + amount_stocks);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
 
         }
     }

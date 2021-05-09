@@ -6,65 +6,66 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 
-
 public class DBManipulateSQL extends MySqlConnection {
-
-    private void insertDB(Integer id, String stockname, Double price, Date price_date, String industry) {
-        
-        String sql1 = "INSERT IGNORE INTO stockname(id,stockname) VALUES(?,?);";
-        String sql2 = "INSERT IGNORE INTO industry(id,industry) VALUES(?,?);";
-        String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES "
-         + "(?,?,?,(SELECT id FROM stockname WHERE stockname = ?),(SELECT id FROM industry WHERE industry = ?))";
-
-        try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
-        PreparedStatement pstmt = connection.prepareStatement(sql1);
-        PreparedStatement pstmt2 = connection.prepareStatement(sql2);
-        PreparedStatement pstmt3 = connection.prepareStatement(sql3)) {
-            pstmt.setInt(1, id);
-            pstmt.setString(2, stockname);
-            pstmt.executeUpdate();
-
-            pstmt2.setInt(1, id);
-            pstmt2.setString(2,industry);
-            pstmt2.executeUpdate();
-
-            pstmt3.setInt(1, id);
-            pstmt3.setDouble(2, price);
-            pstmt3.setDate(3, price_date);
-            pstmt3.setString(4, stockname);
-            pstmt3.setString(5, industry);
-            pstmt3.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }  
-    }
 
     public void importCSVFileToDB_SQL(String path) {
 
-        try (BufferedReader csvReader = new BufferedReader(new FileReader(path));){
-            
+        try (BufferedReader csvReader = new BufferedReader(new FileReader(path));) {
+
             Integer rowNo = 0;
-            String line = "";
+            String line; 
             while ((line = csvReader.readLine()) != null) {
 
                 String[] values = line.split(";");
 
                 if (rowNo > 0) {
-                    System.out.println(values[0] + " | " + values[1] + " | " + values[2] + " | " + values[3]);
-                    insertDB(rowNo, values[0], DBType.parseToDouble(values[1]), DBType.parseDate(values[2]), values[3]);
+                    System.out.println(rowNo + " | " + values[0] + " | " + values[1] + " | " + values[2] + " | " + values[3]);
+
+                    Integer id = rowNo;
+                    String stock_name = values[0];
+                    Double price = DBType.parseToDouble(values[1]);
+                    Date price_date = DBType.parseDate(values[2]);
+                    String industry_name = values[3];
+
+                    String sql1 = "INSERT IGNORE INTO stock(id,stock_name) VALUES(?,?);";
+                    String sql2 = "INSERT IGNORE INTO industry(id,industry_name) VALUES(?,?);";
+                    String sql3 = "INSERT INTO price_per_date(id,price,date,id_stockname,id_industry) VALUES "
+                            + "(?,?,?,(SELECT id FROM stock WHERE stock_name = ?),(SELECT id FROM industry WHERE industry_name = ?));";
+
+                    try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
+                            PreparedStatement pstmt = connection.prepareStatement(sql1);
+                            PreparedStatement pstmt2 = connection.prepareStatement(sql2);
+                            PreparedStatement pstmt3 = connection.prepareStatement(sql3)) {
+                        pstmt.setInt(1, id);
+                        pstmt.setString(2, stock_name);
+                        pstmt.executeUpdate();
+
+                        pstmt2.setInt(1, id);
+                        pstmt2.setString(2, industry_name);
+                        pstmt2.executeUpdate();
+
+                        pstmt3.setInt(1, id);
+                        pstmt3.setDouble(2, price);
+                        pstmt3.setDate(3, price_date);
+                        pstmt3.setString(4, stock_name);
+                        pstmt3.setString(5, industry_name);
+                        pstmt3.executeUpdate();
+
+                    } catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
                 rowNo++;
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getCause());
         }
     }
 
-    public void deleteTableSQL(String table) {
-        String sql = "DELETE FROM " + table +";";
+    public void deleteAllValuesOfTable(String table) {
+        String sql = "DELETE FROM " + table + ";";
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.executeUpdate();
@@ -105,7 +106,7 @@ public class DBManipulateSQL extends MySqlConnection {
 
     public void updateIndustrySQL(String industryID, String industryUpdateName) {
 
-        String sql = "UPDATE industry SET industry = ? WHERE id = ?;";
+        String sql = "UPDATE industry SET industry_name = ? WHERE id = ?;";
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
 

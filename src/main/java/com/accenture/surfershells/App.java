@@ -9,7 +9,6 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         Boolean exit = true;
 
-        
         System.out.println( "|*****************|");
         System.out.println( "| Welcome to ISA! |");
         System.out.println( "|*****************|");
@@ -21,7 +20,7 @@ public class App {
             String input = scanner.nextLine();
             new Commandos().importCSV(input);
             new Commandos().delete(input);
-            new Commandos().searchStockname(scanner, input);
+            new Commandos().searchStock(scanner, input);
             new Commandos().addPrice(scanner, input);
             new Commandos().showStockValues(scanner, input);
             new Commandos().maxStockValue(scanner, input);
