@@ -93,7 +93,7 @@ public class Commandos {
 
     public void showIndustries(String input) {
         if ("INDUSTRIES".equals(input)) {
-            new DBViewSQL().showIndustriesSQL();
+            new DBViewSQL().listIndustriesSQL();
         }
 
     }

@@ -95,7 +95,7 @@ public class DBViewSQL extends MySqlConnection {
         
     }
 
-    public void showIndustriesSQL() {
+    public void listIndustriesSQL() {
 
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 Statement st = connection.createStatement()) {
