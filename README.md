@@ -18,4 +18,4 @@ The customer “International Stock Analysis” (ISA) wants to create an applica
 -	The “GAP <id>” command shows the difference between the highest and the lowest price ever recorded.
 -	The “UPDATE-INDUSTRY <id> <industry>” command updates a stocks industry.
 -	The “INDUSTRIES” command lists all industries in the database with its ID and the number of stocks assigned to this 	industry.
--	The “EXPORT” command exports all data to a CSV file which could be imported again.
+-	The “EXPORT” command exports all data to a CSV.
