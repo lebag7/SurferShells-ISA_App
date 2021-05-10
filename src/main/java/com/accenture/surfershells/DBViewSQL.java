@@ -100,7 +100,7 @@ public class DBViewSQL extends MySqlConnection {
         try (Connection connection = this.connectDB("jdbc:mysql://localhost:3306/isa_db", "root", "root");
                 Statement st = connection.createStatement()) {
 
-            ResultSet rs = st.executeQuery("SELECT  count(distinct id_stockname) as amount_stocks, industry_name, id_industry FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id group by industry_name, id_industry;");
+            ResultSet rs = st.executeQuery("SELECT count(distinct id_stockname) as amount_stocks, industry_name, id_industry FROM isa_db.price_per_date LEFT JOIN industry ON price_per_date.id_industry = industry.id group by industry_name, id_industry;");
             
             while (rs.next()) {
                 Integer idIndustry = rs.getInt("id_industry");

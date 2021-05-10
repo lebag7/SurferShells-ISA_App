@@ -91,7 +91,7 @@ public class Commandos {
 
     }
 
-    public void showIndustries(String input) {
+    public void listIndustries(String input) {
         if ("INDUSTRIES".equals(input)) {
             new DBViewSQL().listIndustriesSQL();
         }

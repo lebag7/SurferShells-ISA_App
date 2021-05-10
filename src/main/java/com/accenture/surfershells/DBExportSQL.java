@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.sql.*;
 
 import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvException;
 
 public class DBExportSQL extends MySqlConnection {
 

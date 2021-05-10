@@ -27,7 +27,7 @@ public class App {
             new Commandos().minStockValue(scanner, input);
             new Commandos().gapStockValue(scanner, input);
             new Commandos().updateIndustry(scanner, input);
-            new Commandos().showIndustries( input);
+            new Commandos().listIndustries( input);
             new Commandos().exportDB(input);
 
             if ("EXIT".equals(input)) {

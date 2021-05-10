@@ -86,12 +86,10 @@ public class DBManipulateSQL extends MySqlConnection {
                 Statement st = connection.createStatement();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            ResultSet rsIndustryID = st
-                    .executeQuery("SELECT * FROM price_per_date WHERE id_stockname='" + id_stockname + "';");
+            ResultSet rs = st.executeQuery("SELECT id_industry FROM price_per_date WHERE id_stockname='" + id_stockname + "';");
             int industryID = 0;
-            while (rsIndustryID.next()) {
-                //Nur ein Schleifendurchlauf
-                industryID = rsIndustryID.getInt("id_industry");
+            while (rs.next()) {
+                industryID = rs.getInt("id_industry");
             }
 
             pstmt.setDouble(1, price);
